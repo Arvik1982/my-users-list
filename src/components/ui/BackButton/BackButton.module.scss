@@ -1,0 +1,19 @@
+.backIconDesktop {
+  width: 28px;
+  height: 28px;
+  display: block;
+
+  @media (max-width: 600px) {
+    display: none;
+  }
+}
+
+.backIconMobile {
+  width: 24px;
+  height: 24px;
+  display: none;
+
+  @media (max-width: 600px) {
+    display: block;
+  }
+}

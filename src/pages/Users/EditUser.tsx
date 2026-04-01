@@ -1,61 +1,47 @@
-import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { fetchUserById, updateUser } from '@/api/endpoints/users';
 import { queryKeys } from '@/api/queryKeys';
+import BackIcon from '@/components/ui/BackButton/BackButton';
+import { Button } from '@/components/ui/Button/Button';
+import { ErrorIcon } from '@/components/ui/Icons/ErrorIcon/ErrorIcon';
+import { Input } from '@/components/ui/Input/Input';
+import { Loader } from '@/components/ui/Loader/Loader';
+import { Modal } from '@/components/ui/Modal/Modal';
+import Success from '@/components/ui/Success/Success';
 import { useUsersStore } from '@/store/usersStore';
+import {
+  FORM_FIELDS,
+  getAvatarUrl,
+  mapFormDataToUser,
+  mapUserToFormData,
+} from '@/utils/constants';
 import {
   userEditSchema,
   type UserEditFormData,
 } from '@/utils/validators/user.schema';
-import { Toast } from '@/components/ui/Toast/Toast';
-import { Loader } from '@/components/ui/Loader/Loader';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { useNavigate, useParams } from 'react-router-dom';
 import styles from './EditUser.module.scss';
-import { IUser } from '@/types/user.types';
-
-const getAvatarUrl = (userId: number) => {
-  return `https://i.pravatar.cc/150?img=${userId % 70}`;
-};
-
-const mapUserToFormData = (user: IUser): UserEditFormData => ({
-  name: user.name,
-  username: user.username,
-  email: user.email,
-  city: user.address.city,
-  phone: user.phone.replace(/\D/g, ''),
-  companyName: user.company.name,
-});
-
-const mapFormDataToUser = (
-  formData: UserEditFormData,
-  originalUser: IUser
-) => ({
-  ...originalUser,
-  name: formData.name,
-  username: formData.username,
-  email: formData.email,
-  phone: formData.phone,
-  address: {
-    ...originalUser.address,
-    city: formData.city,
-  },
-  company: {
-    ...originalUser.company,
-    name: formData.companyName,
-  },
-});
 
 const EditUser = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { updateUser: updateUserInStore } = useUsersStore();
-  const [showToast, setShowToast] = useState(false);
-  const [toastMessage, setToastMessage] = useState('');
 
-  const userId = Number(id);
+  const [modalState, setModalState] = useState<{
+    isOpen: boolean;
+    title: string;
+    type: 'success' | 'error';
+  }>({
+    isOpen: false,
+    title: '',
+    type: 'success',
+  });
+
+  const userId = useMemo(() => Number(id), [id]);
 
   // Загрузка данных пользователя
   const {
@@ -66,6 +52,10 @@ const EditUser = () => {
     queryKey: queryKeys.users.detail(userId),
     queryFn: () => fetchUserById(userId),
     enabled: !isNaN(userId),
+    // Не рефетчить при переключении вкладок
+    refetchOnWindowFocus: false,
+    // Данные считаются свежими 5 минут
+    staleTime: 1000 * 60 * 5,
   });
 
   const {
@@ -86,14 +76,12 @@ const EditUser = () => {
     mode: 'onChange',
   });
 
-  // Заполнение формы при загрузке данных
   useEffect(() => {
     if (user) {
       reset(mapUserToFormData(user));
     }
   }, [user, reset]);
 
-  // Мутация для сохранения
   const updateMutation = useMutation({
     mutationFn: (formData: UserEditFormData) => {
       if (!user) throw new Error('User not found');
@@ -113,22 +101,59 @@ const EditUser = () => {
         company: updatedUser.company,
       });
 
-      setToastMessage('Данные успешно сохранены!');
-      setShowToast(true);
-
-      setTimeout(() => {
-        navigate('/dashboard');
-      }, 1500);
+      setModalState({
+        isOpen: true,
+        title: 'Изменения сохранены!',
+        type: 'success',
+      });
     },
     onError: () => {
-      setToastMessage('Ошибка при сохранении данных');
-      setShowToast(true);
+      setModalState({
+        isOpen: true,
+        title: 'Ошибка при сохранении',
+        type: 'error',
+      });
     },
   });
 
-  const onSubmit = (data: UserEditFormData) => {
-    updateMutation.mutate(data);
-  };
+  const onSubmit = useCallback(
+    (data: UserEditFormData) => {
+      updateMutation.mutate(data);
+    },
+    [updateMutation]
+  );
+
+  const handleCloseModal = useCallback(() => {
+    setModalState((prev) => ({ ...prev, isOpen: false }));
+    if (modalState.type === 'success') {
+      navigate('/dashboard');
+    }
+  }, [modalState.type, navigate]);
+
+  const handleNavigateBack = useCallback(() => {
+    navigate('/dashboard');
+  }, [navigate]);
+
+  const avatarUrl = useMemo(() => getAvatarUrl(userId), [userId]);
+  const isButtonDisabled = useMemo(
+    () => isSubmitting || !isDirty,
+    [isSubmitting, isDirty]
+  );
+
+  const renderFormFields = useCallback(() => {
+    return FORM_FIELDS.map((field) => (
+      <Input
+        key={field.name}
+        label={field.label}
+        type={field.type}
+        {...register(field.name as keyof UserEditFormData)}
+        error={errors[field.name as keyof UserEditFormData]?.message}
+        placeholder={field.placeholder}
+        inputSize="desktop"
+        fullWidth
+      />
+    ));
+  }, [register, errors]);
 
   if (isLoading) {
     return <Loader />;
@@ -138,9 +163,7 @@ const EditUser = () => {
     return (
       <div className={styles.error}>
         <p>Пользователь не найден</p>
-        <button onClick={() => navigate('/dashboard')}>
-          Вернуться на главную
-        </button>
+        <Button onClick={handleNavigateBack}>Вернуться на главную</Button>
       </div>
     );
   }
@@ -150,136 +173,87 @@ const EditUser = () => {
       <div className={styles.editUser}>
         <div className={styles.container}>
           <button
-            onClick={() => navigate('/dashboard')}
+            onClick={handleNavigateBack}
             className={styles.backBtn}
+            aria-label="Вернуться назад"
           >
-            ← Назад
+            <BackIcon />
+            <span className={styles.backText}>Назад</span>
           </button>
 
-          <div className={styles.card}>
-            <div className={styles.avatar}>
-              <img src={getAvatarUrl(userId)} alt={user.name} />
+          <div className={styles.layout}>
+            <div className={styles.sidebar}>
+              <div className={styles.sidebarContent}>
+                <div className={styles.avatarWrapper}>
+                  <img
+                    src={avatarUrl}
+                    alt={user.name}
+                    className={styles.avatarImage}
+                    loading="lazy"
+                  />
+                </div>
+
+                <div className={styles.categories}>
+                  {[
+                    'Настройки',
+                    'Безопасность',
+                    'Уведомления',
+                    'Приватность',
+                  ].map((category, index) => (
+                    <div key={category} className={styles.category}>
+                      <div
+                        className={
+                          index === 0
+                            ? styles.categoryName
+                            : styles.categoryNameMuted
+                        }
+                      >
+                        {category}
+                      </div>
+                      <div className={styles.categoryLine}></div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
 
-            <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
-              <div className={styles.formGrid}>
-                <div className={styles.formGroup}>
-                  <label>Имя *</label>
-                  <input
-                    type="text"
-                    {...register('name')}
-                    className={errors.name ? styles.error : ''}
-                  />
-                  {errors.name && (
-                    <span className={styles.errorMessage}>
-                      {errors.name.message}
-                    </span>
-                  )}
-                </div>
-
-                <div className={styles.formGroup}>
-                  <label>Никнейм *</label>
-                  <input
-                    type="text"
-                    {...register('username')}
-                    className={errors.username ? styles.error : ''}
-                  />
-                  {errors.username && (
-                    <span className={styles.errorMessage}>
-                      {errors.username.message}
-                    </span>
-                  )}
-                </div>
-
-                <div className={styles.formGroup}>
-                  <label>Email *</label>
-                  <input
-                    type="email"
-                    {...register('email')}
-                    className={errors.email ? styles.error : ''}
-                  />
-                  {errors.email && (
-                    <span className={styles.errorMessage}>
-                      {errors.email.message}
-                    </span>
-                  )}
-                </div>
-
-                <div className={styles.formGroup}>
-                  <label>Город *</label>
-                  <input
-                    type="text"
-                    {...register('city')}
-                    className={errors.city ? styles.error : ''}
-                  />
-                  {errors.city && (
-                    <span className={styles.errorMessage}>
-                      {errors.city.message}
-                    </span>
-                  )}
-                </div>
-
-                <div className={styles.formGroup}>
-                  <label>Телефон *</label>
-                  <input
-                    type="tel"
-                    {...register('phone')}
-                    placeholder="Только цифры"
-                    className={errors.phone ? styles.error : ''}
-                  />
-                  {errors.phone && (
-                    <span className={styles.errorMessage}>
-                      {errors.phone.message}
-                    </span>
-                  )}
-                </div>
-
-                <div className={styles.formGroup}>
-                  <label>Название компании *</label>
-                  <input
-                    type="text"
-                    {...register('companyName')}
-                    className={errors.companyName ? styles.error : ''}
-                  />
-                  {errors.companyName && (
-                    <span className={styles.errorMessage}>
-                      {errors.companyName.message}
-                    </span>
-                  )}
-                </div>
+            <div className={styles.profileData}>
+              <div className={styles.profileHeader}>
+                <h2 className={styles.profileTitle}>Данные профиля</h2>
+                <div className={styles.profileLine}></div>
               </div>
 
-              <div className={styles.formActions}>
-                <button
-                  type="button"
-                  onClick={() => navigate('/dashboard')}
-                  className={styles.cancelBtn}
-                >
-                  Отмена
-                </button>
-                <button
-                  type="submit"
-                  disabled={isSubmitting || !isDirty}
-                  className={styles.saveBtn}
-                >
-                  {isSubmitting ? 'Сохранение...' : 'Сохранить'}
-                </button>
-              </div>
-            </form>
+              <form
+                onSubmit={handleSubmit(onSubmit)}
+                className={styles.form}
+                noValidate
+              >
+                <div className={styles.formFields}>{renderFormFields()}</div>
+
+                <div className={styles.buttons}>
+                  <Button
+                    type="submit"
+                    disabled={isButtonDisabled}
+                    size="desktop"
+                  >
+                    {isSubmitting ? 'Сохранение...' : 'Сохранить'}
+                  </Button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       </div>
 
-      {showToast && (
-        <Toast
-          message={toastMessage}
-          type="success"
-          onClose={() => setShowToast(false)}
-          duration={4000}
-        />
-      )}
+      <Modal
+        isOpen={modalState.isOpen}
+        onClose={handleCloseModal}
+        title={modalState.title}
+        icon={modalState.type === 'success' ? <Success /> : <ErrorIcon />}
+        duration={4000}
+      />
     </>
   );
 };
 
-export default EditUser;
+export default memo(EditUser);

@@ -1,0 +1,99 @@
+@use '@/styles/colors.scss' as *;
+
+// Миксин для адаптивных отступов
+@mixin responsive-padding(
+  $desktop: 40px 150px,
+  $tablet: 24px 40px,
+  $mobile: 16px
+) {
+  padding: $desktop;
+
+  @media (max-width: 1400px) {
+    padding: 32px 100px;
+  }
+
+  @media (max-width: 1200px) {
+    padding: 28px 60px;
+  }
+
+  @media (max-width: 900px) {
+    padding: $tablet;
+  }
+
+  @media (max-width: 768px) {
+    padding: 20px 20px;
+  }
+
+  @media (max-width: 600px) {
+    padding: $mobile;
+  }
+
+  @media (max-width: 375px) {
+    padding: 12px;
+  }
+}
+
+// Миксин для flex-центрирования
+@mixin flex-center($direction: row) {
+  display: flex;
+  flex-direction: $direction;
+  align-items: center;
+  justify-content: center;
+}
+
+// Миксин для текста (шрифт, вес, размер)
+@mixin font($weight: 400, $size: 14px, $line: 19px, $color: $color-01) {
+  font-family: 'Manrope', sans-serif;
+  font-weight: $weight;
+  font-size: $size;
+  line-height: $line;
+  color: $color;
+}
+
+// Миксин для карточек
+@mixin card {
+  background: $color-06;
+  border-radius: 16px;
+}
+
+// Миксин для линий (разделителей)
+@mixin line {
+  width: 100%;
+  height: 1px;
+  background: $color-04;
+}
+
+// Миксин для кнопок
+@mixin button-base {
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+// Миксин для инпутов
+@mixin input-base {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 0px 8px 0px 16px;
+  gap: 8px;
+  width: 100%;
+  height: 42px;
+  border: 2px solid $color-04;
+  border-radius: 50px;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+
+  &:focus-within {
+    border-color: $accent;
+  }
+}

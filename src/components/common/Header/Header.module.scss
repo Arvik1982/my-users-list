@@ -1,0 +1,151 @@
+@use '@/styles/colors.scss' as *;
+@use '@/styles/typography.scss' as *;
+
+.header {
+  width: 100%;
+  background-color: $color-06;
+  height: 56px;
+  padding: 16px 150px;
+  display: flex;
+  flex-direction: row;
+  gap: 32px;
+  box-sizing: border-box;
+  align-items: center;
+
+  @media (max-width: 1400px) {
+    padding: 16px 100px;
+  }
+
+  @media (max-width: 1200px) {
+    padding: 16px 60px;
+  }
+
+  @media (max-width: 900px) {
+    padding: 16px 40px;
+  }
+
+  @media (max-width: 768px) {
+    padding: 12px 20px;
+    height: 52px;
+  }
+
+  @media (max-width: 480px) {
+    padding: 10px 16px;
+    height: 48px;
+    gap: 16px;
+  }
+}
+
+.headerContent {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  height: 24px;
+  align-items: center;
+
+  @media (max-width: 480px) {
+    height: 20px;
+  }
+}
+
+.logoWrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 2px;
+
+  img {
+    width: 24px;
+    height: 24px;
+
+    @media (max-width: 480px) {
+      width: 20px;
+      height: 20px;
+    }
+  }
+}
+
+.logoText {
+  font-family:
+    'Inter',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 22px;
+  color: $color-01;
+  margin: 0;
+
+  @media (max-width: 480px) {
+    font-size: 14px;
+    line-height: 20px;
+  }
+}
+
+.logoTextBold {
+  font-weight: 700;
+}
+
+.rightSection {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+
+  @media (max-width: 480px) {
+    gap: 6px;
+  }
+}
+
+.iconsWrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 52px;
+  gap: 4px;
+  justify-content: space-between;
+
+  @media (max-width: 480px) {
+    width: 44px;
+    gap: 3px;
+  }
+}
+
+.userInfo {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 2px;
+
+  img {
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+
+    @media (max-width: 480px) {
+      width: 18px;
+      height: 18px;
+    }
+  }
+}
+
+.userName {
+  font-family:
+    'Manrope',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 22px;
+  color: $color-01;
+  margin: 0;
+
+  @media (max-width: 480px) {
+    font-size: 14px;
+    line-height: 20px;
+  }
+}

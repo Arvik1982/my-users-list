@@ -1,16 +1,14 @@
-import { useEffect, useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
 import { fetchUsers } from '@/api/endpoints/users';
 import { queryKeys } from '@/api/queryKeys';
-import { useUsersStore } from '@/store/usersStore';
 import { UserCard } from '@/components/common/UserCard/UserCard';
 import { Loader } from '@/components/ui/Loader/Loader';
+import { useUsersStore } from '@/store/usersStore';
 import type { IUserWithStatus } from '@/types/user.types';
+import { useQuery } from '@tanstack/react-query';
+import { useEffect } from 'react';
 import styles from './Dashboard.module.scss';
 
 const Dashboard = () => {
-  const [activeTab, setActiveTab] = useState<'active' | 'archived'>('active');
-
   const {
     setUsers,
     archiveUser,
@@ -21,7 +19,6 @@ const Dashboard = () => {
     usersWithStatus,
   } = useUsersStore();
 
-  // Загрузка пользователей с API
   const {
     data: usersFromApi,
     isLoading,
@@ -46,8 +43,6 @@ const Dashboard = () => {
   const activeUsers = getActiveUsers();
   const archivedUsers = getArchivedUsers();
 
-  const displayedUsers = activeTab === 'active' ? activeUsers : archivedUsers;
-
   if (isLoading) {
     return <Loader />;
   }
@@ -65,42 +60,55 @@ const Dashboard = () => {
 
   return (
     <div className={styles.dashboard}>
-      <header className={styles.header}>
-        <h1>Пользователи</h1>
-        <div className={styles.tabs}>
-          <button
-            className={`${styles.tab} ${activeTab === 'active' ? styles['tab--active'] : ''}`}
-            onClick={() => setActiveTab('active')}
-          >
-            Активные ({activeUsers.length})
-          </button>
-          <button
-            className={`${styles.tab} ${activeTab === 'archived' ? styles['tab--active'] : ''}`}
-            onClick={() => setActiveTab('archived')}
-          >
-            Архив ({archivedUsers.length})
-          </button>
+      {/* Активные пользователи */}
+      <div className={styles.section}>
+        <div className={styles.sectionHeader}>
+          <h2 className={styles.sectionTitle}>Активные</h2>
+          <div className={styles.line}></div>
         </div>
-      </header>
 
-      <div className={styles.usersGrid}>
-        {displayedUsers.length === 0 ? (
-          <div className={styles.emptyState}>
-            <p>Нет пользователей в этом разделе</p>
-          </div>
-        ) : (
-          displayedUsers.map((user) => (
-            <UserCard
-              key={user.id}
-              user={user}
-              onArchive={archiveUser}
-              onUnarchive={unarchiveUser}
-              onHide={hideUser}
-              isArchived={activeTab === 'archived'}
-            />
-          ))
-        )}
+        <div className={styles.cardsGrid}>
+          {activeUsers.length === 0 ? (
+            <div className={styles.emptyState}>
+              <p>Нет активных пользователей</p>
+            </div>
+          ) : (
+            activeUsers.map((user) => (
+              <UserCard
+                key={user.id}
+                user={user}
+                onArchive={archiveUser}
+                onUnarchive={unarchiveUser}
+                onHide={hideUser}
+                isArchived={false}
+              />
+            ))
+          )}
+        </div>
       </div>
+
+      {/* Архив - показываем только если есть архивные пользователи */}
+      {archivedUsers.length > 0 && (
+        <div className={styles.section}>
+          <div className={styles.sectionHeader}>
+            <h2 className={styles.sectionTitle}>Архив</h2>
+            <div className={styles.line}></div>
+          </div>
+
+          <div className={styles.cardsGrid}>
+            {archivedUsers.map((user) => (
+              <UserCard
+                key={user.id}
+                user={user}
+                onArchive={archiveUser}
+                onUnarchive={unarchiveUser}
+                onHide={hideUser}
+                isArchived={true}
+              />
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

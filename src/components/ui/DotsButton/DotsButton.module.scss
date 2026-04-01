@@ -1,0 +1,44 @@
+@use '@/styles/colors.scss' as *;
+
+.menuBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  color: $color-01;
+
+  svg {
+    width: 24px;
+    height: 24px;
+    transition: color 0.2s ease;
+  }
+
+  &.activeCard {
+    color: $color-01;
+
+    &:hover {
+      color: $accent;
+    }
+
+    &:active {
+      color: $color-01;
+    }
+  }
+
+  &.archivedCard {
+    color: $color-02;
+
+    &:hover {
+      color: $color-02;
+    }
+
+    &:active {
+      color: $color-02;
+    }
+  }
+}

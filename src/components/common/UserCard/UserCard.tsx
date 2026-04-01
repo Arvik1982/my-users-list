@@ -1,6 +1,8 @@
-import { useNavigate } from 'react-router-dom';
-import { getAvatarUrl } from '@/utils/formatters';
+import DotsButton from '@/components/ui/DotsButton/DotsButton';
+import { Dropdown, DropdownItem } from '@/components/ui/Dropdown/Dropdown';
 import type { IUserWithStatus } from '@/types/user.types';
+import { getAvatarUrl } from '@/utils/constants';
+import { useNavigate } from 'react-router-dom';
 import styles from './UserCard.module.scss';
 
 interface UserCardProps {
@@ -24,50 +26,62 @@ export const UserCard = ({
     navigate(`/users/${user.id}/edit`);
   };
 
+  const dropdownItems: DropdownItem[] = isArchived
+    ? [
+        {
+          label: 'Активировать',
+          onClick: () => onUnarchive(user.id),
+        },
+      ]
+    : [
+        {
+          label: 'Редактировать',
+          onClick: handleEdit,
+        },
+        {
+          label: 'Архивировать',
+          onClick: () => onArchive(user.id),
+        },
+        {
+          label: 'Скрыть',
+          onClick: () => onHide(user.id),
+          danger: true,
+        },
+      ];
+
   return (
-    <div className={styles.userCard}>
-      <div className={styles.userCard__avatar}>
-        <img src={getAvatarUrl(user.id)} alt={user.name} />
+    <div
+      className={`${styles.userCard} ${isArchived ? styles.archivedCard : ''}`}
+    >
+      <div className={styles.avatar}>
+        <img src={getAvatarUrl(user.id)} alt={user.username} />
       </div>
 
-      <div className={styles.userCard__content}>
-        <h3 className={styles.userCard__username}>@{user.username}</h3>
-        <div className={styles.userCard__info}>
-          <p>
-            <span className={styles.label}>Город:</span>
-            {user.address.city}
-          </p>
-          <p>
-            <span className={styles.label}>Компания:</span>
+      <div className={styles.info}>
+        <div className={styles.usernameCompany}>
+          <div className={styles.usernameWrapper}>
+            <span
+              className={`${styles.username} ${isArchived ? styles.archivedUsername : ''}`}
+            >
+              {user.username}
+            </span>
+
+            <Dropdown items={dropdownItems}>
+              <DotsButton isArchived={isArchived} />
+            </Dropdown>
+          </div>
+          <div
+            className={`${styles.companyName} ${isArchived ? styles.archivedCompanyName : ''}`}
+          >
             {user.company.name}
-          </p>
+          </div>
         </div>
-      </div>
 
-      <div className={styles.userCard__actions}>
-        <button onClick={handleEdit} className={styles.editBtn}>
-          ✏️ Редактировать
-        </button>
-
-        {!isArchived ? (
-          <button
-            onClick={() => onArchive(user.id)}
-            className={styles.archiveBtn}
-          >
-            📦 Архивировать
-          </button>
-        ) : (
-          <button
-            onClick={() => onUnarchive(user.id)}
-            className={styles.unarchiveBtn}
-          >
-            🔄 Активировать
-          </button>
-        )}
-
-        <button onClick={() => onHide(user.id)} className={styles.hideBtn}>
-          👁️ Скрыть
-        </button>
+        <div
+          className={`${styles.city} ${isArchived ? styles.archivedCity : ''}`}
+        >
+          {user.address.city}
+        </div>
       </div>
     </div>
   );
