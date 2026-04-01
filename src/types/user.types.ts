@@ -9,6 +9,8 @@ export interface IUser {
   company: ICompany;
 }
 
+export type IUsersResponse = Array<IUser>;
+
 export interface ICompany {
   name: string;
   catchPhrase: string;
@@ -26,4 +28,16 @@ export interface IAddress {
 export interface IGeo {
   lat: string;
   lng: string;
+}
+export interface IUserWithStatus extends IUser {
+  status: 'active' | 'archived';
+}
+
+export interface IUserFormData {
+  name: string;
+  username: string;
+  email: string;
+  city: string;
+  phone: string;
+  companyName: string;
 }

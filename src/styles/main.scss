@@ -1,0 +1,16 @@
+@use '_fonts' as *;
+
+:root {
+  --font-inter: 'Inter', system-ui, sans-serif;
+  --font-manrope: 'Manrope', system-ui, sans-serif;
+}
+
+* {
+  font-family: var(--font-manrope);
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-inter);
+}
