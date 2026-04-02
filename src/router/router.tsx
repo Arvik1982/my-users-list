@@ -2,11 +2,11 @@ import { MainLayout } from '@/components/layouts/MainLayout';
 import Dashboard from '@/pages/Dashboard/Dashboard';
 import Login from '@/pages/Login/Login';
 import EditUser from '@/pages/Users/EditUser';
-import { createHashRouter, Navigate } from 'react-router-dom';
+import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { ProtectedRoute } from './guards/ProtectedRoute';
 import { PublicRoute } from './guards/PublicRoute';
 
-export const router = createHashRouter([
+export const router = createBrowserRouter([
   {
     path: '/login',
     element: (
