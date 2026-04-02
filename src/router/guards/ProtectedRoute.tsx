@@ -4,6 +4,8 @@ interface ProtectedRouteProps {
   children: React.ReactNode;
 }
 
+// TODO: isAuthenticated
+
 export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   // const [isAuthenticated] = useState(true);
   const [isLoading] = useState(false);

@@ -68,6 +68,7 @@ const EditUser = () => {
     handleSubmit,
     formState: { errors, isSubmitting, isDirty },
     reset,
+    setValue,
   } = useForm<UserEditFormData>({
     resolver: zodResolver(userEditSchema),
     defaultValues: {
@@ -187,9 +188,10 @@ const EditUser = () => {
         placeholder={field.placeholder}
         inputSize="desktop"
         fullWidth
+        onClear={() => setValue(field.name as keyof UserEditFormData, '')}
       />
     ));
-  }, [register, errors]);
+  }, [register, errors, setValue]);
 
   if (isLoading) {
     return <Loader />;

@@ -1,6 +1,5 @@
 @use 'sass:color';
 @use '@/styles/colors.scss' as *;
-@use '@/styles/typography.scss' as *;
 
 .button {
   display: inline-flex;
@@ -14,6 +13,11 @@
   background: $color-01;
   border-radius: 50px;
   color: $color-06;
+
+  font-family: 'Manrope', sans-serif;
+  font-weight: 600;
+  text-align: center;
+  white-space: nowrap;
 
   &:hover:not(:disabled) {
     background: color.scale($color-01, $lightness: 20%);
@@ -32,42 +36,25 @@
   &.desktop {
     padding: 12px 42px;
     height: 46px;
-
-    span,
-    .buttonText {
-      font-family: 'Manrope', sans-serif;
-      font-weight: 600;
-      font-size: 16px;
-      line-height: 22px;
-      color: $color-06;
-      white-space: nowrap;
-    }
+    font-size: 16px;
+    line-height: 100%;
+    letter-spacing: 0%;
+    vertical-align: middle;
   }
 
   &.mobile {
     padding: 12px 42px;
     height: 44px;
-
-    span,
-    .buttonText {
-      font-family: 'Manrope', sans-serif;
-      font-weight: 600;
-      font-size: 14px;
-      line-height: 19px;
-      color: $color-06;
-      white-space: nowrap;
-    }
+    font-size: 14px;
+    line-height: 100%;
+    letter-spacing: 0%;
+    vertical-align: middle;
   }
 
   &.secondary {
     background: transparent;
     border: 2px solid $color-04;
     color: $color-02;
-
-    span,
-    .buttonText {
-      color: $color-02;
-    }
 
     &:hover:not(:disabled) {
       background: rgba(0, 0, 0, 0.05);
@@ -79,11 +66,6 @@
     background: transparent;
     border: 2px solid $color-01;
     color: $color-01;
-
-    span,
-    .buttonText {
-      color: $color-01;
-    }
 
     &:hover:not(:disabled) {
       background: rgba(0, 0, 0, 0.05);
@@ -101,11 +83,6 @@
   .button.desktop {
     padding: 12px 32px;
     height: 44px;
-
-    span,
-    .buttonText {
-      font-size: 14px;
-      line-height: 19px;
-    }
+    font-size: 14px;
   }
 }

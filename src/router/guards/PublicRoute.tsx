@@ -3,6 +3,7 @@ import { useState } from 'react';
 interface PublicRouteProps {
   children: React.ReactNode;
 }
+// TODO: isAuthenticated
 
 export const PublicRoute = ({ children }: PublicRouteProps) => {
   // const [isAuthenticated] = useState(true);

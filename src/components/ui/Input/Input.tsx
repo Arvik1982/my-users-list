@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import CloseIcon from '../CloseIcon/CloseIcon';
 import styles from './Input.module.scss';
 
 interface InputProps extends Omit<
@@ -24,7 +25,6 @@ export const Input: React.FC<InputProps> = ({
 }) => {
   const [isFocused, setIsFocused] = useState(false);
   const hasValue = value !== undefined && value !== '' && value !== null;
-  const showClear = hasValue && onClear && !props.disabled;
 
   const handleClear = () => {
     if (onClear) {
@@ -61,24 +61,8 @@ export const Input: React.FC<InputProps> = ({
           onBlur={() => setIsFocused(false)}
           {...props}
         />
-        {showClear && (
-          <button
-            type="button"
-            className={styles.clearBtn}
-            onClick={handleClear}
-            aria-label="Очистить"
-          >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-              <path
-                d="M18 6L6 18M6 6L18 18"
-                stroke="#595959"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </button>
-        )}
+
+        <CloseIcon onClose={handleClear} className={styles.clearIcon} />
       </div>
 
       {error && <span className={styles.supportingText}>{error}</span>}
