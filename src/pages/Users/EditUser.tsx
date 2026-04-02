@@ -30,6 +30,12 @@ const EditUser = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { updateUser: updateUserInStore } = useUsersStore();
+  const settingsArray = [
+    'Настройки',
+    'Безопасность',
+    'Уведомления',
+    'Приватность',
+  ];
 
   const [modalState, setModalState] = useState<{
     isOpen: boolean;
@@ -43,7 +49,6 @@ const EditUser = () => {
 
   const userId = useMemo(() => Number(id), [id]);
 
-  // Загрузка данных пользователя
   const {
     data: user,
     isLoading,
@@ -52,9 +57,9 @@ const EditUser = () => {
     queryKey: queryKeys.users.detail(userId),
     queryFn: () => fetchUserById(userId),
     enabled: !isNaN(userId),
-    // Не рефетчить при переключении вкладок
+
     refetchOnWindowFocus: false,
-    // Данные считаются свежими 5 минут
+
     staleTime: 1000 * 60 * 5,
   });
 
@@ -88,10 +93,20 @@ const EditUser = () => {
       const updatedUser = mapFormDataToUser(formData, user);
       return updateUser(userId, updatedUser);
     },
-    onSuccess: (updatedUser) => {
-      queryClient.setQueryData(queryKeys.users.detail(userId), updatedUser);
-      queryClient.invalidateQueries({ queryKey: queryKeys.users.list() });
 
+    onMutate: async (formData) => {
+      await queryClient.cancelQueries({
+        queryKey: queryKeys.users.detail(userId),
+      });
+
+      const oldUser = queryClient.getQueryData(queryKeys.users.detail(userId));
+
+      const updatedUser = mapFormDataToUser(formData, user!);
+
+      // обновляем кэш
+      queryClient.setQueryData(queryKeys.users.detail(userId), updatedUser);
+
+      // обновляем стор
       updateUserInStore(userId, {
         name: updatedUser.name,
         username: updatedUser.username,
@@ -101,13 +116,34 @@ const EditUser = () => {
         company: updatedUser.company,
       });
 
+      return { oldUser };
+    },
+
+    // обновляем список
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.users.list(),
+      });
+
       setModalState({
         isOpen: true,
         title: 'Изменения сохранены!',
         type: 'success',
       });
     },
-    onError: () => {
+
+    // откатываем изменения
+    onError: (error, formData, context) => {
+      if (context?.oldUser) {
+        queryClient.setQueryData(
+          queryKeys.users.detail(userId),
+          context.oldUser
+        );
+
+        // Возвращаем старые данные в стор
+        updateUserInStore(userId, context.oldUser);
+      }
+
       setModalState({
         isOpen: true,
         title: 'Ошибка при сохранении',
@@ -194,12 +230,7 @@ const EditUser = () => {
                 </div>
 
                 <div className={styles.categories}>
-                  {[
-                    'Настройки',
-                    'Безопасность',
-                    'Уведомления',
-                    'Приватность',
-                  ].map((category, index) => (
+                  {settingsArray.map((category, index) => (
                     <div key={category} className={styles.category}>
                       <div
                         className={
