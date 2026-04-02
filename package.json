@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "homepage": "https://arvik1982.github.io/my-users-list/",
+  "homepage": "https://arvik1982.github.io/my-users-list",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
