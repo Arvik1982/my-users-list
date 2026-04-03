@@ -10,7 +10,7 @@
 
 ## 🛠️ Технологии
 
-- React 18
+- React 19
 - TypeScript
 - React Router v7
 - Zustand
