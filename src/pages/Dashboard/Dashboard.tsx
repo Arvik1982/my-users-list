@@ -5,7 +5,7 @@ import { Loader } from '@/components/ui/Loader/Loader';
 import { useUsersStore } from '@/store/usersStore';
 import type { IUserWithStatus } from '@/types/user.types';
 import { useQuery } from '@tanstack/react-query';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import styles from './Dashboard.module.scss';
 
 const Dashboard = () => {
@@ -43,6 +43,36 @@ const Dashboard = () => {
   const activeUsers = getActiveUsers();
   const archivedUsers = getArchivedUsers();
 
+  const activeUsersList = useMemo(
+    () =>
+      activeUsers.map((user) => (
+        <UserCard
+          key={user.id}
+          user={user}
+          onArchive={archiveUser}
+          onUnarchive={unarchiveUser}
+          onHide={hideUser}
+          isArchived={false}
+        />
+      )),
+    [activeUsers, archiveUser, unarchiveUser, hideUser]
+  );
+
+  const archivedUsersList = useMemo(
+    () =>
+      archivedUsers.map((user) => (
+        <UserCard
+          key={user.id}
+          user={user}
+          onArchive={archiveUser}
+          onUnarchive={unarchiveUser}
+          onHide={hideUser}
+          isArchived={true}
+        />
+      )),
+    [archivedUsers, archiveUser, unarchiveUser, hideUser]
+  );
+
   if (isLoading) {
     return <Loader />;
   }
@@ -73,16 +103,7 @@ const Dashboard = () => {
               <p>Нет активных пользователей</p>
             </div>
           ) : (
-            activeUsers.map((user) => (
-              <UserCard
-                key={user.id}
-                user={user}
-                onArchive={archiveUser}
-                onUnarchive={unarchiveUser}
-                onHide={hideUser}
-                isArchived={false}
-              />
-            ))
+            activeUsersList
           )}
         </div>
       </div>
@@ -95,18 +116,7 @@ const Dashboard = () => {
             <div className={styles.line}></div>
           </div>
 
-          <div className={styles.cardsGrid}>
-            {archivedUsers.map((user) => (
-              <UserCard
-                key={user.id}
-                user={user}
-                onArchive={archiveUser}
-                onUnarchive={unarchiveUser}
-                onHide={hideUser}
-                isArchived={true}
-              />
-            ))}
-          </div>
+          <div className={styles.cardsGrid}>{archivedUsersList}</div>
         </div>
       )}
     </div>
