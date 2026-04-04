@@ -55,7 +55,7 @@ const UserCard = ({
       className={`${styles.userCard} ${isArchived ? styles.archivedCard : ''}`}
     >
       <div className={styles.avatar}>
-        <img src={getAvatarUrl(user.id)} alt={user.username} />
+        <img src={getAvatarUrl(user.id)} alt={user.username} loading="lazy" />
       </div>
 
       <div className={styles.info}>
