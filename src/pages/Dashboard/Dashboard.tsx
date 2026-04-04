@@ -1,6 +1,7 @@
 import { fetchUsers } from '@/api/endpoints/users';
 import { queryKeys } from '@/api/queryKeys';
-import { UserCard } from '@/components/common/UserCard/UserCard';
+
+import UserCard from '@/components/common/UserCard/UserCard';
 import { Loader } from '@/components/ui/Loader/Loader';
 import { useUsersStore } from '@/store/usersStore';
 import type { IUserWithStatus } from '@/types/user.types';

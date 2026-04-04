@@ -2,6 +2,7 @@ import DotsButton from '@/components/ui/DotsButton/DotsButton';
 import { Dropdown, DropdownItem } from '@/components/ui/Dropdown/Dropdown';
 import type { IUserWithStatus } from '@/types/user.types';
 import { getAvatarUrl } from '@/utils/constants';
+import { memo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './UserCard.module.scss';
 
@@ -13,7 +14,7 @@ interface UserCardProps {
   isArchived?: boolean;
 }
 
-export const UserCard = ({
+const UserCard = ({
   user,
   onArchive,
   onUnarchive,
@@ -86,3 +87,5 @@ export const UserCard = ({
     </div>
   );
 };
+
+export default memo(UserCard);
