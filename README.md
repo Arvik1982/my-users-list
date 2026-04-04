@@ -4,7 +4,7 @@
 
 ## 🚀 Демо
 
-[https://arvik1982.github.io/my-users-list/]
+[https://arvik1982.github.io/my-users-list/#/]
 
 ---
 
