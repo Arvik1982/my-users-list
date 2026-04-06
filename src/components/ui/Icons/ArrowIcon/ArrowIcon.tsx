@@ -9,17 +9,17 @@ export default function ArrowIcon() {
     >
       <path
         d="M13.125 14H0.875"
-        stroke="#595959"
+        stroke="#595958"
         strokeWidth="1.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
       <path
         d="M7 20.125L0.875 14L7 7.875"
-        stroke="#595959"
+        stroke="#595958"
         strokeWidth="1.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   );
