@@ -4,6 +4,7 @@ interface CloseIconProps {
   onClose: () => void;
   className?: string;
 }
+//test
 
 export default function CloseIcon({ onClose, className }: CloseIconProps) {
   return (
